@@ -1,0 +1,27 @@
+[Unit]
+Description=SmartHome Hub Daemon
+After=network-online.target mosquitto.service zigbee2mqtt.service
+Wants=network-online.target
+Requires=mosquitto.service
+
+[Service]
+Type=simple
+User=smarthome
+Group=smarthome
+ExecStart=/usr/local/bin/smarthome-hub -c /etc/smarthome/hub.conf
+Restart=always
+RestartSec=5
+WatchdogSec=120
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/log/smarthome-hub.log /etc/smarthome
+PrivateTmp=yes
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=smarthome-hub
+LimitNOFILE=4096
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,41 @@
+# Zigbee2MQTT Configuration
+# /opt/zigbee2mqtt/data/configuration.yaml
+
+homeassistant: false
+
+# MQTT connection to local Mosquitto
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://localhost:1883
+
+# Sonoff Zigbee 3.0 USB Dongle Plus
+serial:
+  port: /dev/ttyUSB0
+  adapter: zstack
+
+# Frontend disabled (we manage via our own app)
+frontend: false
+
+# Device settings
+advanced:
+  log_level: info
+  log_output:
+    - console
+  channel: 25
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
+
+  # Transmit power (adjust for your environment)
+  transmit_power: 20
+
+  # Last seen
+  last_seen: epoch
+
+# Permit join disabled by default (controlled via app)
+permit_join: false
+
+# Device-specific options
+device_options:
+  # Report battery and other attributes more frequently
+  legacy: false

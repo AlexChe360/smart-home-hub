@@ -1,0 +1,41 @@
+# SmartHome Hub Configuration
+# /etc/smarthome/hub.conf
+#
+# Заводской конфиг — hub_id содержит серийный номер устройства,
+# hub_token = "change-me-during-setup".
+# При первом запуске хаб автоматически зарегистрируется в облаке
+# и заменит эти значения на реальные UUID и JWT токен.
+
+# ─── Hub Identity ───
+# Заводской серийный номер (прошивается на производстве)
+# После провижинга автоматически заменяется на UUID
+hub_id    = HUB-000000000000
+hub_token = change-me-during-setup
+
+# ─── MQTT (Local Mosquitto) ───
+mqtt_host      = 127.0.0.1
+mqtt_port      = 1883
+mqtt_client_id = smarthome-hub
+
+# ─── Cloud Connection ───
+cloud_host    = api.smarthome.com
+cloud_port    = 443
+cloud_path    = /ws/hub
+cloud_use_tls = true
+
+# URL для REST API (провижинг и регистрация)
+# Если не задан — строится из cloud_host автоматически
+cloud_api_url = https://api.smarthome.com
+
+# ─── Zigbee2MQTT ───
+z2m_base_topic = zigbee2mqtt
+
+# ─── Timings (seconds) ───
+heartbeat_interval     = 30
+reconnect_min          = 1
+reconnect_max          = 60
+status_report_interval = 300
+
+# ─── Logging ───
+log_level = 2
+log_file  = /var/log/smarthome-hub.log
