@@ -18,14 +18,14 @@ mqtt_port      = 1883
 mqtt_client_id = smarthome-hub
 
 # ─── Cloud Connection ───
-cloud_host    = api.smarthome.com
+cloud_host    = smart-homes.kz
 cloud_port    = 443
 cloud_path    = /ws/hub
 cloud_use_tls = true
 
 # URL для REST API (провижинг и регистрация)
 # Если не задан — строится из cloud_host автоматически
-cloud_api_url = https://api.smarthome.com
+cloud_api_url = https://smart-homes.kz/api
 
 # ─── Zigbee2MQTT ───
 z2m_base_topic = zigbee2mqtt
