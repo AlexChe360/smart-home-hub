@@ -71,6 +71,7 @@ set(SOURCES
     src/hub_core.c
     src/logger.c
     src/cJSON.c
+    src/provisioning.c
 )
 
 # ── Build ──
