@@ -82,7 +82,7 @@ if [ ! -d /opt/zigbee2mqtt ]; then
 
     git clone --depth 1 https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt
     cd /opt/zigbee2mqtt
-    npm ci
+    npm install
     cd "$SCRIPT_DIR"
 else
     warn "Zigbee2MQTT already installed, skipping..."
