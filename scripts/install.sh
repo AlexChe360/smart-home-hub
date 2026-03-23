@@ -82,9 +82,15 @@ if [ ! -d /opt/zigbee2mqtt ]; then
 
     git clone --depth 1 https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt
     cd /opt/zigbee2mqtt
-    npm install
-    cd "$SCRIPT_DIR"
-else
+    # Install pnpm
+    if ! command -v pnpm &>/dev/null; then
+        npm install -g pnpm
+    fi
+
+    # Install dependencies
+    pnpm install
+        cd "$SCRIPT_DIR"
+    else
     warn "Zigbee2MQTT already installed, skipping..."
 fi
 
@@ -148,20 +154,26 @@ log "Hub daemon installed to /usr/local/bin/smarthome-hub"
 mkdir -p /etc/smarthome
 if [ ! -f /etc/smarthome/hub.conf ]; then
     cp "$PROJECT_DIR/config/hub.conf.example" /etc/smarthome/hub.conf
+fi
 
-    # Generate unique Hub ID from MAC address
-    MAC=$(cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address 2>/dev/null | tr -d ':' | tr '[:lower:]' '[:upper:]')
-    if [ -n "$MAC" ]; then
-        sed -i "s/HUB-000000000000/HUB-${MAC}/" /etc/smarthome/hub.conf
+# Generate unique Hub ID from MAC address
+IFACE=$(ip route show default | awk '/default/ {print $5}' | head -1)
+MAC=$(cat /sys/class/net/"$IFACE"/address 2>/dev/null | tr -d ':' | tr '[:lower:]' '[:upper:]')
+
+if [ -n "$MAC" ]; then
+    if grep -q '^hub_id=HUB-0\+$' /etc/smarthome/hub.conf; then
+        sed -i "s/^hub_id=HUB-0\+$/hub_id=HUB-${MAC}/" /etc/smarthome/hub.conf
         log "Hub ID: HUB-${MAC}"
+    else
+        warn "hub_id already set, skipping"
     fi
+fi
 
-    # Generate random token
+# Generate random token only if still default
+if grep -q '^hub_token=change-me-during-setup$' /etc/smarthome/hub.conf; then
     TOKEN=$(openssl rand -hex 32)
-    sed -i "s/change-me-during-setup/${TOKEN}/" /etc/smarthome/hub.conf
+    sed -i "s/^hub_token=change-me-during-setup$/hub_token=${TOKEN}/" /etc/smarthome/hub.conf
     log "Hub token generated"
-else
-    warn "Config exists, not overwriting"
 fi
 
 chown -R smarthome:smarthome /etc/smarthome
