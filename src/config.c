@@ -76,6 +76,35 @@ static void config_set(hub_config_t *cfg, const char *key, const char *val)
     else LOG_WARN("config", "Unknown key: %s", key);
 }
 
+int config_save(const hub_config_t *cfg, const char *filepath)
+{
+    FILE *f = fopen(filepath, "w");
+    if (!f) {
+        return -1;
+    }
+
+    fprintf(f, "hub_id=%s\n", cfg->hub_id);
+    fprintf(f, "hub_token=%s\n", cfg->hub_token);
+    fprintf(f, "cloud_host=%s\n", cfg->cloud_host);
+    fprintf(f, "cloud_port=%d\n", cfg->cloud_port);
+    fprintf(f, "cloud_path=%s\n", cfg->cloud_path);
+    fprintf(f, "cloud_use_tls=%d\n", cfg->cloud_use_tls);
+
+    fprintf(f, "mqtt_host=%s\n", cfg->mqtt_host);
+    fprintf(f, "mqtt_port=%d\n", cfg->mqtt_port);
+    fprintf(f, "mqtt_client_id=%s\n", cfg->mqtt_client_id);
+    fprintf(f, "z2m_base_topic=%s\n", cfg->z2m_base_topic);
+
+    fprintf(f, "log_level=%d\n", cfg->log_level);
+    fprintf(f, "heartbeat_interval=%d\n", cfg->heartbeat_interval);
+    fprintf(f, "status_report_interval=%d\n", cfg->status_report_interval);
+    fprintf(f, "reconnect_min=%d\n", cfg->reconnect_min);
+    fprintf(f, "reconnect_max=%d\n", cfg->reconnect_max);
+
+    fclose(f);
+    return 0;
+}
+
 int config_load(hub_config_t *cfg, const char *filepath)
 {
     config_defaults(cfg);
