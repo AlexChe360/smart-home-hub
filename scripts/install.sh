@@ -46,9 +46,9 @@ apt-get install -y \
 # ─── 2. Create smarthome user ───
 if ! id -u smarthome &>/dev/null; then
     log "Creating smarthome user..."
+    useradd -r -s /usr/sbin/nologin -d /var/lib/smarthome smarthome
     mkdir -p /var/lib/smarthome
     chown smarthome:smarthome /var/lib/smarthome
-    useradd -r -s /usr/sbin/nologin -d /var/lib/smarthome smarthome
 fi
 usermod -a -G dialout smarthome
 
@@ -60,7 +60,6 @@ listener 1883 127.0.0.1
 allow_anonymous true
 max_connections 50
 persistence true
-persistence_location /var/lib/mosquitto/
 
 # Logging
 log_dest syslog
