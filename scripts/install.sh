@@ -156,24 +156,34 @@ if [ ! -f /etc/smarthome/hub.conf ]; then
     cp "$PROJECT_DIR/config/hub.conf.example" /etc/smarthome/hub.conf
 fi
 
+# Generate random token only if still default
+if grep -Eq '^[[:space:]]*hub_token[[:space:]]*=[[:space:]]*change-me-during-setup[[:space:]]*$' /etc/smarthome/hub.conf; then
+    TOKEN=$(openssl rand -hex 32)
+    sed -i "s|^[[:space:]]*hub_token[[:space:]]*=[[:space:]]*change-me-during-setup[[:space:]]*$|hub_token = ${TOKEN}|" /etc/smarthome/hub.conf
+    log "Hub token generated"
+fi
+
 # Generate unique Hub ID from MAC address
-IFACE=$(ip route show default | awk '/default/ {print $5}' | head -1)
-MAC=$(cat /sys/class/net/"$IFACE"/address 2>/dev/null | tr -d ':' | tr '[:lower:]' '[:upper:]')
+IFACE=$(ip route show default 2>/dev/null | awk '/default/ {print $5}' | head -1)
+
+if [ -z "$IFACE" ]; then
+    for iface in eth0 wlan0; do
+        if [ -d "/sys/class/net/$iface" ]; then
+            IFACE=$iface
+            break
+        fi
+    done
+fi
+
+MAC=$(cat "/sys/class/net/$IFACE/address" 2>/dev/null | tr -d ':' | tr '[:lower:]' '[:upper:]')
 
 if [ -n "$MAC" ]; then
-    if grep -q '^hub_id=HUB-0\+$' /etc/smarthome/hub.conf; then
-        sed -i "s/^hub_id=HUB-0\+$/hub_id=HUB-${MAC}/" /etc/smarthome/hub.conf
+    if grep -Eq '^[[:space:]]*hub_id[[:space:]]*=[[:space:]]*HUB-0+[[:space:]]*$' /etc/smarthome/hub.conf; then
+        sed -i "s|^[[:space:]]*hub_id[[:space:]]*=[[:space:]]*HUB-0+[[:space:]]*$|hub_id = HUB-${MAC}|" /etc/smarthome/hub.conf
         log "Hub ID: HUB-${MAC}"
     else
         warn "hub_id already set, skipping"
     fi
-fi
-
-# Generate random token only if still default
-if grep -q '^hub_token=change-me-during-setup$' /etc/smarthome/hub.conf; then
-    TOKEN=$(openssl rand -hex 32)
-    sed -i "s/^hub_token=change-me-during-setup$/hub_token=${TOKEN}/" /etc/smarthome/hub.conf
-    log "Hub token generated"
 fi
 
 chown -R smarthome:smarthome /etc/smarthome
